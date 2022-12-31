@@ -1,6 +1,6 @@
 # Attendance Tracker App Final Project
 
-### Video Demo :
+### Video Demo : https://youtu.be/mlTFMKaAMwM
 
 ### An android app for the final project in the CS50X Harvard course
 
@@ -31,3 +31,7 @@
 - React Native in the Expo SDK
 
 - SQLite
+
+## Installation
+
+### There is an included apk in the project folder
