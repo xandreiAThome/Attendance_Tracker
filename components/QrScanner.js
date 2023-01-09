@@ -51,7 +51,7 @@ export default function QrScanner({ navigation, route }) {
   //handles what happens when the qr code is scanned
   const handleQrCodeScanned = ({ type, data }) => {
     setScanned(true);
-    setText(data);
+    setText(data.trim());
 
     // !!! Scanning is asynchronous so if I make these date variables a state it will be undefined because the getDate function is also asynchrounous
     let day = currentTime.getDate();
@@ -63,7 +63,7 @@ export default function QrScanner({ navigation, route }) {
     db.transaction((tx) => {
       tx.executeSql(
         "SELECT classID FROM classlist WHERE name = ?",
-        [data],
+        [data.trim()],
         (txObj, resultSet) => {
           let x = resultSet.rows._array.length;
           if (x === 0) {

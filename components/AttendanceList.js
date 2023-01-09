@@ -8,6 +8,9 @@ import {
   Alert,
   Dimensions,
   useWindowDimensions,
+  ImageBackground,
+  TextInput,
+  Keyboard,
 } from "react-native";
 import * as SQLite from "expo-sqlite";
 import React from "react";
@@ -22,6 +25,7 @@ import ModalDropdown from "react-native-modal-dropdown";
 import * as XLSX from "xlsx";
 import * as FileSystem from "expo-file-system";
 import * as Sharing from "expo-sharing";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const monthNames = [
   "January",
@@ -38,11 +42,46 @@ const monthNames = [
   "December",
 ];
 
+// TODO : Make the add student function in the attendance list
 export default function AttendanceList(props) {
   const db = SQLite.openDatabase("Attendance.db");
   const [nameSet, setNameSet] = React.useState([{ name: "", classID: "" }]);
   const [attendanceScreen, setAttendanceScreen] = React.useState(true);
   const [date, setDate] = React.useState(new Date());
+  const [addStudent, setAddStudent] = React.useState(false);
+
+  const [render, setRender] = React.useState(0);
+
+  const addRef = React.useRef();
+
+  //Force update
+  function updatePls() {
+    setRender((render) => render + 1);
+    console.log("update");
+  }
+
+  // Automatically shows keyboard when add student button is clicked
+  React.useEffect(() => {
+    setTimeout(() => {
+      if (addStudent === true) {
+        addRef.current.focus();
+      }
+    }, 100);
+  }, [addStudent]);
+
+  // Automatically hides the add student input text when keyboard is closed
+  React.useEffect(() => {
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setAddStudent(false); // or some other action
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   // Retrieves the list of students
   React.useEffect(() => {
@@ -56,7 +95,7 @@ export default function AttendanceList(props) {
         (error) => console.log("error wasnt able to retrieve student names")
       );
     });
-  }, [date]);
+  }, [date, render]);
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate;
@@ -159,7 +198,7 @@ export default function AttendanceList(props) {
     finalArray = [];
   }
 
-  // index of 0 is Export, index of 1 is Delete
+  // index of 0 is Export, index of 1 is Delete, index of 2 is add student
   function dropDownSetting(index) {
     //Export
     if (index === 0) {
@@ -190,6 +229,11 @@ export default function AttendanceList(props) {
         { text: "No", onPress: () => console.log("Cancel"), style: "cancel" },
       ]);
     }
+
+    //add student
+    if (index === 2) {
+      setAddStudent(true);
+    }
   }
 
   return (
@@ -209,12 +253,15 @@ export default function AttendanceList(props) {
       >
         <View style={styles.topViewContainer}>
           <View style={styles.titleContainer}>
-            <Pressable onPress={() => props.setAttendanceListVisibilty(false)}>
+            <Pressable
+              onPress={() => props.setAttendanceListVisibilty(false)}
+              android_ripple={{ color: "#dddddd" }}
+            >
               <MaterialIcons name="arrow-back-ios" size={24} color="black" />
             </Pressable>
             <Text style={{ fontSize: 20 }}>{props.class}</Text>
             <ModalDropdown
-              options={["Export", "Delete Classlist"]}
+              options={["Export", "Delete Classlist", "Add Student"]}
               onSelect={(index) => dropDownSetting(index)}
               dropdownStyle={{ height: "auto" }}
               dropdownTextStyle={{
@@ -264,6 +311,7 @@ export default function AttendanceList(props) {
                   attendanceScreen={attendanceScreen}
                   date={date}
                   classID={itemData.item.classID}
+                  updatePls={updatePls}
                 />
               );
             }}
@@ -271,21 +319,40 @@ export default function AttendanceList(props) {
         </View>
 
         <View style={styles.bottomContainer}>
-          <Text style={{ fontSize: 20 }}>
-            {monthNames[date.getMonth()]} {date.getDate()}, {date.getFullYear()}
-          </Text>
-          <Pressable
-            onPress={showDatepicker}
-            onChange={onChange}
-            style={{
-              backgroundColor: "#24a0ed",
-              borderRadius: 6,
-              paddingHorizontal: 3,
-              marginLeft: 6,
-            }}
-          >
-            <AntDesign name="calendar" size={24} color="white" />
-          </Pressable>
+          {addStudent ? (
+            <View style={styles.addStudentContainer}>
+              <TextInput
+                placeholder="Student Name"
+                style={styles.addStudentText}
+                ref={addRef}
+              />
+              <Pressable
+                style={{ marginLeft: 10, flex: 1 }}
+                android_ripple={{ color: "#dddddd" }}
+              >
+                <Ionicons name="add-circle" size={32} color="white" />
+              </Pressable>
+            </View>
+          ) : (
+            <>
+              <Text style={{ fontSize: 20 }}>
+                {monthNames[date.getMonth()]} {date.getDate()},{" "}
+                {date.getFullYear()}
+              </Text>
+              <Pressable
+                onPress={showDatepicker}
+                onChange={onChange}
+                style={{
+                  backgroundColor: "#24a0ed",
+                  borderRadius: 6,
+                  paddingHorizontal: 3,
+                  marginLeft: 6,
+                }}
+              >
+                <AntDesign name="calendar" size={24} color="white" />
+              </Pressable>
+            </>
+          )}
         </View>
       </View>
     </Modal>
@@ -351,5 +418,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "white",
     paddingHorizontal: 6,
+  },
+  addStudentText: {
+    borderRadius: 6,
+    backgroundColor: "white",
+    padding: 1,
+    width: "80%",
+    marginRight: 25,
+  },
+  addStudentContainer: {
+    flexDirection: "row",
   },
 });

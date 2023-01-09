@@ -17,41 +17,43 @@ export default function Class(props) {
     React.useState(false);
 
   return (
-    <View style={styles.classContainer}>
-      <Text style={styles.textContainer}>{props.class}</Text>
-      <Pressable
-        style={styles.buttonContainer}
-        android_ripple={{ color: "#dddddd" }}
-        onPress={() => setAttendanceListVisibilty(true)}
-      >
+    <Pressable
+      style={styles.buttonContainer}
+      android_ripple={{ color: "#dddddd" }}
+      onPress={() => setAttendanceListVisibilty(true)}
+    >
+      <View style={styles.classContainer}>
+        <Text style={styles.textContainer}>{props.class}</Text>
+
         <MaterialIcons name="arrow-forward-ios" size={24} color="black" />
-      </Pressable>
-      {attendaceListVisibility && (
-        <AttendanceList
-          setAttendanceListVisibilty={setAttendanceListVisibilty}
-          class={props.class}
-          useForceUpdate={props.useForceUpdate}
-        />
-      )}
-    </View>
+
+        {attendaceListVisibility && (
+          <AttendanceList
+            setAttendanceListVisibilty={setAttendanceListVisibilty}
+            class={props.class}
+            useForceUpdate={props.useForceUpdate}
+          />
+        )}
+      </View>
+    </Pressable>
   );
 }
 const styles = StyleSheet.create({
   classContainer: {
-    flexDirection: "row",
     borderRadius: 10,
     padding: 16,
-    justifyContent: "space-between",
     alignItems: "center",
-
     backgroundColor: "white",
     flex: 1,
     margin: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   textContainer: {
     fontSize: 24,
   },
   buttonContainer: {
     alignItems: "center",
+    flexDirection: "row",
   },
 });

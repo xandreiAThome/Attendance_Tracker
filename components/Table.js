@@ -1,8 +1,10 @@
-import { View, Text } from "react-native";
+import { View, Text, Alert } from "react-native";
 import QrCodeContainer from "./QrCodeContainer";
 import { StyleSheet } from "react-native";
 import React from "react";
 import * as SQLite from "expo-sqlite";
+import ModalDropdown from "react-native-modal-dropdown";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function Table(props) {
   const [attendanceDate, setAttendanceDate] = React.useState([{ time: "" }]);
@@ -36,17 +38,70 @@ export default function Table(props) {
     // !!! It creates double renders, but its the best solution I can think of
   }, [props.date, props.name]);
 
+  function deleteStudent() {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "DELETE FROM classlist WHERE name = ?",
+          [props.name],
+          (txObj, resultSet) => {
+            resolve("deleted succesfully");
+          },
+          (error) => reject("unable to delete")
+        );
+      });
+    });
+  }
+
+  async function awaitAndUpdate() {
+    let resolve = await deleteStudent();
+    console.log(resolve);
+    props.updatePls();
+  }
+
+  //index of 0 is Delete
+  function dropDownSetting(index) {
+    //Delete
+    if (index === 0) {
+      Alert.alert("Delete", "Delete from student classlist?", [
+        {
+          text: "Yes",
+          onPress: async () => awaitAndUpdate(),
+        },
+        { text: "No", onPress: () => console.log("Cancel"), style: "cancel" },
+      ]);
+    }
+  }
+
   return (
     <View style={styles.rowContainer}>
-      <Text style={styles.text}>{props.name}</Text>
-      {props.attendanceScreen && (
-        <Text style={styles.text}>{attendanceDate[0].time}</Text>
-      )}
-      {!props.attendanceScreen && (
-        <View style={styles.saveQrContainer}>
-          <QrCodeContainer name={props.name} />
-        </View>
-      )}
+      <ModalDropdown
+        options={["Delete from Classlist"]}
+        onSelect={(index) => dropDownSetting(index)}
+        dropdownStyle={{ height: "auto" }}
+        dropdownTextStyle={{
+          color: "black",
+          fontSize: 14,
+          alignSelf: "center",
+        }}
+      >
+        <MaterialCommunityIcons
+          name="dots-horizontal"
+          size={24}
+          color="black"
+        />
+      </ModalDropdown>
+      <View style={styles.nameAndTime}>
+        <Text style={{ marginLeft: 5 }}>{props.name}</Text>
+        {props.attendanceScreen && (
+          <Text style={{ marginRight: 30 }}>{attendanceDate[0].time}</Text>
+        )}
+        {!props.attendanceScreen && (
+          <View style={styles.saveQrContainer}>
+            <QrCodeContainer name={props.name} />
+          </View>
+        )}
+      </View>
     </View>
   );
 }
@@ -66,9 +121,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
   },
-  text: {
-    marginHorizontal: 30,
+  nameAndTime: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    flex: 1,
+    alignItems: "center",
   },
 });

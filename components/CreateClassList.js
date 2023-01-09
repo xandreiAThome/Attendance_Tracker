@@ -1,5 +1,4 @@
 import {
-  Button,
   FlatList,
   StyleSheet,
   Text,
@@ -7,9 +6,6 @@ import {
   View,
   Modal,
   Pressable,
-  BackHandler,
-  Alert,
-  KeyboardAvoidingView,
 } from "react-native";
 import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -31,7 +27,7 @@ export default function CreateClassList(props) {
     if (enternedName !== "") {
       setClassInfo((prevInfo) => [
         ...prevInfo,
-        { name: enternedName, id: Math.random().toString() },
+        { name: enternedName.trim(), id: Math.random().toString() },
       ]);
       setEnteredName("");
     }
@@ -61,7 +57,7 @@ export default function CreateClassList(props) {
       db.transaction((tx) => {
         tx.executeSql(
           "INSERT INTO classlist (name, class) VALUES (?, ?)",
-          [classInfo[x].name, enteredClassName],
+          [classInfo[x].name.trim(), enteredClassName],
           (txObj, resultSet) => console.log("Inserted succesfully")
         ),
           (error) => console.log("error not inserted");
@@ -87,10 +83,13 @@ export default function CreateClassList(props) {
     >
       <View style={styles.createContainer}>
         <View style={styles.exitContainer}>
-          <Pressable onPress={() => props.setCreateClassListModal(false)}>
+          <Pressable
+            onPress={() => props.setCreateClassListModal(false)}
+            android_ripple={{ color: "#dddddd" }}
+          >
             <Text style={{ color: "black", marginLeft: 6 }}>Cancel</Text>
           </Pressable>
-          <Pressable onPress={saveClass}>
+          <Pressable onPress={saveClass} android_ripple={{ color: "#dddddd" }}>
             <Text style={{ color: "black", marginRight: 6 }}>Save</Text>
           </Pressable>
         </View>
@@ -107,7 +106,10 @@ export default function CreateClassList(props) {
               return (
                 <View style={styles.listItemsContainer}>
                   <Text>{itemData.item.name}</Text>
-                  <Pressable onPress={() => removeName(itemData.item.id)}>
+                  <Pressable
+                    onPress={() => removeName(itemData.item.id)}
+                    android_ripple={{ color: "#dddddd" }}
+                  >
                     <Ionicons name="trash" size={18} />
                   </Pressable>
                 </View>
@@ -123,7 +125,11 @@ export default function CreateClassList(props) {
             style={styles.studentNameInputContainer}
             value={enternedName}
           />
-          <Pressable style={{ marginLeft: 10, flex: 1 }} onPress={addClassInfo}>
+          <Pressable
+            style={{ marginLeft: 10, flex: 1 }}
+            onPress={addClassInfo}
+            android_ripple={{ color: "#dddddd" }}
+          >
             <Ionicons name="add-circle" size={32} color="white" />
           </Pressable>
         </View>
@@ -147,7 +153,6 @@ const styles = StyleSheet.create({
   },
   addNameContainer: {
     flexDirection: "row",
-    flex: 1,
     justifyContent: "space-between",
     alignItems: "center",
     padding: 1,
@@ -159,11 +164,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#ECECEC",
   },
   exitContainer: {
-    flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#96dfaf",
+    padding: 8,
   },
   studentNameInputContainer: {
     borderRadius: 8,

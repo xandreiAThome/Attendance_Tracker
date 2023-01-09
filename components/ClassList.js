@@ -28,7 +28,6 @@ export default function ClassList({ route, navigation }) {
     setValue((value) => value + 1); // update state to force render
     // An function that increment 👆🏻 the previous state like here
     // is better than directly setting `value + 1`
-    console.log(value, "hjfhf");
   }
 
   React.useEffect(() => {

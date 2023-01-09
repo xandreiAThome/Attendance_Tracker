@@ -35,3 +35,12 @@
 ## Installation
 
 ### There is an included apk in the project folder
+
+## File Components
+
+- The QrScanner.js and AttendanceList.js are the two main components of the app, they are the tab components.
+- CreateClassList.js is the modal that pops up when you press the create new class list button
+- Class.js is the component that renders every instance of a class in the ClassList tab
+- Attendance.js is the modal that pops up when you click the expand button on the Class componen. It displays the list of all students and their arrival time on the chosen date and also stores the corrosponding qr codes for each of the students
+- QrCodeContainer.js just contains the Qrcode Image and the download button for the qrcodes
+- Table.js displays the individual names of the students and their corrosponding arrival time
