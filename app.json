@@ -36,6 +36,7 @@
     },
     "android": {
       "package": "attendance_tracker.final_project",
+      "softwareKeyboardLayoutMode": "resizeMode",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
