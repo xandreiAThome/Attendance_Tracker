@@ -11,6 +11,7 @@ import {
   ImageBackground,
   TextInput,
   Keyboard,
+  Button,
 } from "react-native";
 import * as SQLite from "expo-sqlite";
 import React from "react";
@@ -49,7 +50,7 @@ export default function AttendanceList(props) {
   const [attendanceScreen, setAttendanceScreen] = React.useState(true);
   const [date, setDate] = React.useState(new Date());
   const [addStudent, setAddStudent] = React.useState(false);
-
+  const [addStudentName, setAddStudentName] = React.useState("");
   const [render, setRender] = React.useState(0);
 
   const addRef = React.useRef();
@@ -236,6 +237,27 @@ export default function AttendanceList(props) {
     }
   }
 
+  function handleAddStudent(enteredText) {
+    setAddStudentName(enteredText);
+  }
+
+  function addStudentToDB() {
+    if (addStudentName !== "") {
+      console.log("");
+      db.transaction((tx) => {
+        tx.executeSql(
+          "INSERT INTO classlist (name, class) VALUES (?, ?)",
+          [addStudentName.trim(), props.class],
+          (txObj, resultSet) => console.log("added student succesfully"),
+          (error) => console.log("error, student not inserted")
+        );
+      });
+    }
+    setAddStudentName("");
+    setAddStudent(false);
+    updatePls();
+  }
+
   return (
     <Modal
       animationType="slide"
@@ -300,6 +322,7 @@ export default function AttendanceList(props) {
             <Text style={styles.headingText}>Arrival Time</Text>
           </View>
         )}
+
         <View style={styles.tableContainer}>
           <FlatList
             data={nameSet}
@@ -318,42 +341,43 @@ export default function AttendanceList(props) {
           />
         </View>
 
-        <View style={styles.bottomContainer}>
-          {addStudent ? (
-            <View style={styles.addStudentContainer}>
-              <TextInput
-                placeholder="Student Name"
-                style={styles.addStudentText}
-                ref={addRef}
-              />
-              <Pressable
-                style={{ marginLeft: 10, flex: 1 }}
-                android_ripple={{ color: "#dddddd" }}
-              >
-                <Ionicons name="add-circle" size={32} color="white" />
-              </Pressable>
-            </View>
-          ) : (
-            <>
-              <Text style={{ fontSize: 20 }}>
-                {monthNames[date.getMonth()]} {date.getDate()},{" "}
-                {date.getFullYear()}
-              </Text>
-              <Pressable
-                onPress={showDatepicker}
-                onChange={onChange}
-                style={{
-                  backgroundColor: "#24a0ed",
-                  borderRadius: 6,
-                  paddingHorizontal: 3,
-                  marginLeft: 6,
-                }}
-              >
-                <AntDesign name="calendar" size={24} color="white" />
-              </Pressable>
-            </>
-          )}
-        </View>
+        {addStudent ? (
+          <View style={styles.addStudentContainer}>
+            <TextInput
+              placeholder="Student Name"
+              style={styles.addStudentText}
+              onChangeText={handleAddStudent}
+              ref={addRef}
+              value={addStudentName}
+            />
+            <Pressable
+              style={{ marginLeft: 10, flex: 1 }}
+              onPress={addStudentToDB}
+              android_ripple={{ color: "#dddddd" }}
+            >
+              <Ionicons name="add-circle" size={32} color="white" />
+            </Pressable>
+          </View>
+        ) : (
+          <View style={styles.bottomContainer}>
+            <Text style={{ fontSize: 20 }}>
+              {monthNames[date.getMonth()]} {date.getDate()},{" "}
+              {date.getFullYear()}
+            </Text>
+            <Pressable
+              onPress={showDatepicker}
+              onChange={onChange}
+              style={{
+                backgroundColor: "#24a0ed",
+                borderRadius: 6,
+                paddingHorizontal: 3,
+                marginLeft: 6,
+              }}
+            >
+              <AntDesign name="calendar" size={24} color="white" />
+            </Pressable>
+          </View>
+        )}
       </View>
     </Modal>
   );
@@ -420,13 +444,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
   },
   addStudentText: {
-    borderRadius: 6,
+    borderRadius: 8,
     backgroundColor: "white",
-    padding: 1,
-    width: "80%",
-    marginRight: 25,
+    padding: 4,
+    flex: 9,
   },
   addStudentContainer: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 9,
+    backgroundColor: "#96dfaf",
+    width: "100%",
   },
 });

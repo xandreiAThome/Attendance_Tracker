@@ -26,7 +26,7 @@ export default function QrCodeContainer(props) {
           fileName: `${props.name}_QrCode`,
         }}
       >
-        <QRCode value={props.name} size={64} />
+        <QRCode value={props.name} size={96} />
       </ViewShot>
       <Pressable onPress={captureViewShot}>
         <MaterialIcons name="save" size={24} color="black" />

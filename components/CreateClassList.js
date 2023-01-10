@@ -6,6 +6,7 @@ import {
   View,
   Modal,
   Pressable,
+  Button,
 } from "react-native";
 import React from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -155,12 +156,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 1,
     padding: 9,
     backgroundColor: "#96dfaf",
   },
   listContainer: {
-    flex: 19,
+    flex: 1,
     backgroundColor: "#ECECEC",
   },
   exitContainer: {

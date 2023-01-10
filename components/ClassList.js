@@ -52,6 +52,7 @@ export default function ClassList({ route, navigation }) {
     <View style={styles.mainContainer}>
       <View style={styles.classListContainer}>
         <FlatList
+          keyboardShouldPersistTaps="handled"
           style={{ width: "100%", marginTop: 40 }}
           data={distinctClasses}
           renderItem={(itemData) => {
